@@ -1,3 +1,20 @@
+"""
+There should be some descriptions of the code.
+
+ex:
+
+input:
+8 8
+1 4 E
+RMLLM
+4 5 N
+LMRML
+
+output:
+1 4 N
+3 6 W
+"""
+
 directions = ['N','E','S','W'] 
 movement = {'N': (0,1), 'E': (1,0), 'S': (0,-1), 'W':(-1,0)}
 commands = {'L': 'turn_left', 'R': 'turn_right', 'M': 'move'}
@@ -43,7 +60,8 @@ first_vehicle_y = vehicle_one.y
 vehicle_two_pos = raw_input().split()
 vehicle_two_commands = raw_input()
 
-vehicle_two = Vehicle(int(vehicle_two_pos[0]), int(vehicle_two_pos[1]), vehicle_two_ps[2])
+## one bug here vehicle_two_ps -> vehicle_two_pos
+vehicle_two = Vehicle(int(vehicle_two_pos[0]), int(vehicle_two_pos[1]), vehicle_two_pos[2])
 for command in vehicle_two_commands:
     eval("vehicle_two.{0}()".format(commands[command]))
 
