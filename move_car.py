@@ -14,56 +14,61 @@ output:
 1 4 N
 3 6 W
 """
-
-directions = ['N','E','S','W'] 
-movement = {'N': (0,1), 'E': (1,0), 'S': (0,-1), 'W':(-1,0)}
-commands = {'L': 'turn_left', 'R': 'turn_right', 'M': 'move'}
-
-GRID_MAX_X, GRID_MAX_Y = map(int, raw_input().split())
-
-first_vehicle_x = None
-first_vehicle_y = None
-
 class Vehicle():
-    def __init__(self, x, y, face):
+    directions = 'NESW' 
+    movement = {'N': (0,1), 'E': (1,0), 'S': (0,-1), 'W':(-1,0)}
+
+    def __init__(self, x, y, face, grid, obstacle):
         self.x = x
         self.y = y
         self.dir = face
+	self.grid_width, self.grid_height = grid
+        self.obstacle = obstacle
 
     def turn_left(self):
-        self.dir = directions[(directions.index(self.dir)-1)%len(directions)]
+        self.dir = self.directions[(self.directions.index(self.dir)-1)%len(self.directions)]
 
     def turn_right(self):
-        self.dir = directions[(directions.index(self.dir)+1)%len(directions)]
+        self.dir = self.directions[(self.directions.index(self.dir)+1)%len(self.directions)]
+  
+    def Uturn(self):
+        self.dir = self.directions[(self.directions.index(self.dir)+2)%len(self.directions)]
+
+    def excute_command(self, commands):
+        action = {
+		'L': self.turn_left,
+		'R': self.turn_right,
+		'M': self.move,
+		}
+	for command in commands:
+	    action[command]()
 
     def move(self):
-        new_x = self.x + movement[self.dir][0]
-        new_y = self.y + movement[self.dir][1]
+        new_x = self.x + self.movement[self.dir][0]
+        new_y = self.y + self.movement[self.dir][1]
 
-        if new_x != first_vehicle_x or new_y != first_vehicle_y:
-            if new_x in xrange(GRID_MAX_X+1):
-                self.x = new_x
-            if new_y in xrange(GRID_MAX_Y+1):
-                self.y = new_y
+        if (new_x, new_y) != self.obstacle and 0<=new_x<=self.grid_width and 0<=new_y<=self.grid_height:
+	    self.x = new_x
+	    self.y = new_y 
 
-vehicle_one_pos = raw_input().split()
-vehicle_one_commands = raw_input()
+    def direction(self):
+        return self.dir
 
-vehicle_one = Vehicle(int(vehicle_one_pos[0]), int(vehicle_one_pos[1]), vehicle_one_pos[2])
-for command in vehicle_one_commands:
-    eval("vehicle_one.{0}()".format(commands[command]))
+    def position(self):
+        return (self.x, self.y)
 
-first_vehicle_x = vehicle_one.x
-first_vehicle_y = vehicle_one.y
+def move_vehicle(grid, obstacle):
+    vehicle_pos  = raw_input().split()
+    vehicle = Vehicle(int(vehicle_pos[0]), int(vehicle_pos[1]), vehicle_pos[2], grid, obstacle)
+    vehicle.excute_command(raw_input().strip())
+    return vehicle.position, vehicle.direction
 
+def main():
+    grid = map(int, raw_input().split())
+    vehicle_one_pos, vehicle_one_dir = move_vehicle(grid, None)
+    vehicle_two_pos, vehicle_two_dir = move_vehicle(grid, vehicle_one_pos)
+    print vehicle_one_pos[0], vehicle_one_pos[1], vehicle_one_dir
+    print vehicle_two_pos[0], vehicle_two_pos[1], vehicle_two_dir
 
-vehicle_two_pos = raw_input().split()
-vehicle_two_commands = raw_input()
-
-## one bug here vehicle_two_ps -> vehicle_two_pos
-vehicle_two = Vehicle(int(vehicle_two_pos[0]), int(vehicle_two_pos[1]), vehicle_two_pos[2])
-for command in vehicle_two_commands:
-    eval("vehicle_two.{0}()".format(commands[command]))
-
-print vehicle_one.x, vehicle_one.y, vehicle_one.dir
-print vehicle_two.x, vehicle_two.y, vehicle_two.dir
+if __name__ == '__main__':
+    main()
